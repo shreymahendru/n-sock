@@ -7,6 +7,9 @@ import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 
 
+/**
+ * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
+ */
 export class SocketServer implements Disposable
 {
     private readonly _socketServer: SocketIO.Server;
@@ -28,6 +31,11 @@ export class SocketServer implements Disposable
         this._disposePromise = null;
         
         this._socketServer.adapter(SocketIoRedis(this._client as any));
+        
+        this._socketServer.on("connection", (socket) =>
+        {
+            console.log("Client connected", socket.id);
+        });
     }   
     
     
