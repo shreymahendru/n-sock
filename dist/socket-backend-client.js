@@ -18,7 +18,7 @@ class SocketBackendClient {
         n_defensive_1.given(event, "event").ensureHasValue().ensureIsString();
         event = event.trim();
         n_defensive_1.given(data, "data").ensureHasValue().ensureIsObject();
-        this._socketClient.of(channel).emit(event, data);
+        this._socketClient.of(`/${channel}`).emit(event, data);
     }
     dispose() {
         if (!this._isDisposed) {

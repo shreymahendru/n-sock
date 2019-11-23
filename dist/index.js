@@ -4,6 +4,4 @@ const socket_server_1 = require("./socket-server");
 exports.SocketServer = socket_server_1.SocketServer;
 const socket_backend_client_1 = require("./socket-backend-client");
 exports.SocketBackendClient = socket_backend_client_1.SocketBackendClient;
-const socket_frontend_client_1 = require("./socket-frontend-client");
-exports.SocketFrontEndClient = socket_frontend_client_1.SocketFrontEndClient;
 //# sourceMappingURL=index.js.map

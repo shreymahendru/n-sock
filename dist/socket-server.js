@@ -14,9 +14,17 @@ class SocketServer {
             ? Redis.createClient() : Redis.createClient(n_config_1.ConfigurationManager.getConfig("REDIS_URL"));
         this._isDisposed = false;
         this._disposePromise = null;
-        this._socketServer.adapter(SocketIoRedis(this._client));
+        this._socketServer.adapter(SocketIoRedis({
+            pubClient: this._client,
+            subClient: this._client
+        }));
         this._socketServer.on("connection", (socket) => {
             console.log("Client connected", socket.id);
+            socket.on("n-sock-join_channel", (data) => {
+                n_defensive_1.given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
+                const nsp = this._socketServer.of(`/${data.channel}`);
+                console.log(`Client ${socket.id} joined channel ${nsp.name}`);
+            });
         });
     }
     dispose() {
