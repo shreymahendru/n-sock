@@ -35,44 +35,50 @@ export class SocketServer implements Disposable
             subClient: this._client
         }));
         
-        this._socketServer.on("connection", (socket) =>
-        {
-            console.log("Client connected", socket.id);
-            
-            socket.on("n-sock-join_channel", (data: { channel: string }) =>
-            {
-                given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
-                
-                const nsp = this._socketServer.of(`/${data.channel}`);
-                
-                console.log(`Client ${socket.id} joining channel ${nsp.name}`);
-                
-                nsp.on("connection", (s) =>
-                {
-                    console.log(`Client ${s.id} joined channel ${nsp.name}`);
-                    
-                    s.emit("n-sock-join_channel-joined", {channel: nsp.name.substr(1)});
-                });
-            });
-            
-            // socket.on("n-sock-leave_channel", (data: { channel: string }) =>
-            // {
-            //     given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
-
-
-            // });
-        });
+        this.initialize();
     }   
-    
     
     public dispose(): Promise<void>
     {
         if (!this._isDisposed)
         {
             this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) => this._client.quit(() => resolve()));
+            this._disposePromise = new Promise((resolve, _) =>
+            {
+                this._socketServer.close(() =>
+                {
+                    this._client.quit(() =>
+                    {
+                        resolve();
+                    });
+                });
+            });
         }
 
         return this._disposePromise as Promise<void>;
+    }
+    
+    private initialize(): void
+    {
+        this._socketServer.on("connection", (socket) =>
+        {
+            console.log("Client connected", socket.id);
+
+            socket.on("n-sock-join_channel", (data: { channel: string }) =>
+            {
+                given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
+
+                const nsp = this._socketServer.of(`/${data.channel}`);
+
+                console.log(`Client ${socket.id} joining channel ${nsp.name}`);
+
+                nsp.on("connection", (s) =>
+                {
+                    console.log(`Client ${s.id} joined channel ${nsp.name}`);
+
+                    s.emit("n-sock-join_channel-joined", { channel: nsp.name.substr(1) });
+                });
+            });
+        });
     }
 }
