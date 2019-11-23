@@ -45,7 +45,12 @@ export class SocketServer implements Disposable
                 
                 const nsp = this._socketServer.of(`/${data.channel}`);
                 
-                console.log(`Client ${socket.id} joined channel ${nsp.name}`);
+                console.log(`Client ${socket.id} joining channel ${nsp.name}`);
+                
+                nsp.on("connection", (s) =>
+                {
+                    console.log(`Client ${s.id} connected to channel ${nsp.name}`);
+                });
             });
             
             // socket.on("n-sock-leave_channel", (data: { channel: string }) =>
