@@ -30,11 +30,30 @@ export class SocketServer implements Disposable
         this._isDisposed = false;
         this._disposePromise = null;
         
-        this._socketServer.adapter(SocketIoRedis(this._client as any));
+        this._socketServer.adapter(SocketIoRedis({
+            pubClient: this._client,
+            subClient: this._client
+        }));
         
         this._socketServer.on("connection", (socket) =>
         {
             console.log("Client connected", socket.id);
+            
+            socket.on("n-sock-join_channel", (data: { channel: string }) =>
+            {
+                given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
+                
+                const nsp = this._socketServer.of(`/${data.channel}`);
+                
+                console.log(`Client ${socket.id} joined channel ${nsp.name}`);
+            });
+            
+            // socket.on("n-sock-leave_channel", (data: { channel: string }) =>
+            // {
+            //     given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
+
+
+            // });
         });
     }   
     

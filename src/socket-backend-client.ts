@@ -27,6 +27,7 @@ export class SocketBackendClient implements Disposable
         this._socketClient = SocketIoEmitter(this._client as any);
     }
     
+    
     public publish(channel: string, event: string, data: object): void
     {
         given(channel, "channel").ensureHasValue().ensureIsString();
@@ -37,9 +38,8 @@ export class SocketBackendClient implements Disposable
         
         given(data, "data").ensureHasValue().ensureIsObject();
         
-        this._socketClient.of(channel).emit(event, data);
+        this._socketClient.of(`/${channel}`).emit(event, data);
     }
-    
     
     public dispose(): Promise<void>
     {

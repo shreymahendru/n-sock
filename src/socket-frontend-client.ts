@@ -1,17 +1,19 @@
 import * as SocketIOClient from "socket.io-client";
 import { given } from "@nivinjoseph/n-defensive";
-import { Disposable } from "@nivinjoseph/n-util";
+import { Disposable, Mutex } from "@nivinjoseph/n-util";
 
 
 /**
  * This should only listen (subscribe) to events, should not emit (publish)
  */
-export class SocketFrontEndClient implements Disposable
+export class SocketFrontendClient implements Disposable
 {
     private readonly _serverUrl: string;
-    private readonly _channels: Map<string, SocketIOClient.Socket>;
+    private readonly _client: SocketIOClient.Socket;
+    private readonly _channels = new Map<string, SocketIOClient.Socket>();
+    private readonly _mutex = new Mutex();
     
-    private _isDisposed: boolean;
+    private _isDisposed = false;
     
     
     public constructor(serverUrl: string)
@@ -20,17 +22,19 @@ export class SocketFrontEndClient implements Disposable
         serverUrl = serverUrl.trim();
         if (serverUrl.endsWith("/"))
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
-        
         this._serverUrl = serverUrl;    
         
-        this._channels = new Map<string, SocketIOClient.Socket>();
-        
-        this._isDisposed = false;
+        this._client = SocketIOClient.connect(this._serverUrl, {
+            // WARNING: in that case, there is no fallback to long-polling
+            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+        });
     }
     
     
-    public subscribe(channel: string, event: string, handler: (data: any) => void): void
+    public async subscribe(channel: string, event: string, handler: (data: any) => void): Promise<void>
     {
+        // should be synchronized;
+        
         given(channel, "channel").ensureHasValue().ensureIsString();
         channel = channel.trim();
         
@@ -39,60 +43,105 @@ export class SocketFrontEndClient implements Disposable
         
         given(handler, "handler").ensureHasValue().ensureIsFunction();
         
-        if (!this._channels.has(channel))
-            this._channels.set(channel, this.createChannel(channel));
+        await this._mutex.lock();
+        try
+        {
+            if (!this._channels.has(channel))
+            {
+                const socket = await this.createChannel(channel);
+                this._channels.set(channel, socket);
+            }
 
-        const socket = this._channels.get(channel);
-        
-        socket.on(event, handler);
+            const socket = this._channels.get(channel);
+
+            socket.on(event, handler);
+        }
+        finally
+        {
+            this._mutex.release();
+        }
     }
     
-    public unsubscribe(channel: string, event?: string, handler?: (data: any) => void): void
+    public async unsubscribe(channel: string, event?: string, handler?: (data: any) => void): Promise<void>
     {
+        // should be synchronized
+        
         given(channel, "channel").ensureHasValue().ensureIsString();
         channel = channel.trim();
         
-        if (!this._channels.has(channel))
-            return;
-        
-        const socket = this._channels.get(channel);
-        
-        if (!event)
+        await this._mutex.lock();
+        try
         {
-            socket.close();
-            this._channels.delete(channel);
-            return;
+            if (!this._channels.has(channel))
+                return;
+
+            const socket = this._channels.get(channel);
+
+            if (!event)
+            {
+                socket.close();
+                this._channels.delete(channel);
+                return;
+            }
+
+            given(event, "event").ensureHasValue().ensureIsString();
+            event = event.trim();
+
+            given(handler as Function, "handler").ensureIsFunction();
+
+            socket.off(event, handler || null);
         }
-        
-        given(event, "event").ensureHasValue().ensureIsString();
-        event = event.trim();
-        
-        given(handler as Function, "handler").ensureIsFunction();
-        
-        socket.off(event, handler || null);
+        finally
+        {
+            this._mutex.release();
+        }
     }
-    
     
     public dispose(): Promise<void>
     {
         if (!this._isDisposed)
         {
             this._isDisposed = true;
+            
             for (const value of this._channels.values())
                 value.close();
+            
+            this._client.close();
         }
         
         return Promise.resolve();
     }
     
-    private createChannel(channel: string): SocketIOClient.Socket
+    private createChannel(channel: string): Promise<SocketIOClient.Socket>
     {
-        given(channel, "channel").ensureHasValue().ensureIsString();
-        channel = channel.trim();
-        
-        return SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
-            // WARNING: in that case, there is no fallback to long-polling
-            transports: ["websocket"] // or [ 'websocket', 'polling' ], which is the same thing
+        return new Promise((resolve, reject) =>
+        {
+            try 
+            {
+                given(channel, "channel").ensureHasValue().ensureIsString();
+                channel = channel.trim();
+
+                this._client.emit("n-sock-join_channel", { channel }, (_: any) =>
+                {
+                    try 
+                    {
+                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
+                            // WARNING: in that case, there is no fallback to long-polling
+                            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+                        });
+
+                        resolve(socket);
+                    }
+                    catch (error)
+                    {
+                        reject(error);
+                    }
+                });
+            }
+            catch (error)
+            {
+                reject(error);
+            }
         });
     }
 }
