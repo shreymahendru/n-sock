@@ -85,17 +85,11 @@ class SocketFrontendClient {
             try {
                 n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
                 channel = channel.trim();
-                this._client.emit("n-sock-join_channel", { channel }, (_) => {
-                    try {
-                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
-                            transports: ["websocket"],
-                        });
-                        resolve(socket);
-                    }
-                    catch (error) {
-                        reject(error);
-                    }
+                this._client.emit("n-sock-join_channel", { channel });
+                const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
+                    transports: ["websocket"],
                 });
+                resolve(socket);
             }
             catch (error) {
                 reject(error);
