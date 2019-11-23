@@ -89,7 +89,12 @@ class SocketFrontendClient {
                 const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
                     transports: ["websocket"],
                 });
-                resolve(socket);
+                socket.on("n-sock-join_channel-joined", (data) => {
+                    if (data.channel === channel)
+                        resolve(socket);
+                    else
+                        reject(new Error(`Joined channel mismatch; expected '${channel}', actual '${data.channel}'`));
+                });
             }
             catch (error) {
                 reject(error);
