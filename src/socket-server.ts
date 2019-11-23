@@ -49,7 +49,9 @@ export class SocketServer implements Disposable
                 
                 nsp.on("connection", (s) =>
                 {
-                    console.log(`Client ${s.id} connected to channel ${nsp.name}`);
+                    console.log(`Client ${s.id} joined channel ${nsp.name}`);
+                    
+                    s.emit("n-sock-join_channel-joined", {channel: nsp.name.substr(1)});
                 });
             });
             

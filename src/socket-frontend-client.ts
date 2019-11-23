@@ -127,8 +127,14 @@ export class SocketFrontendClient implements Disposable
                     // WARNING: in that case, there is no fallback to long-polling
                     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
                 });
-
-                resolve(socket);
+                
+                socket.on("n-sock-join_channel-joined", (data: {channel: string}) =>
+                {
+                    if (data.channel === channel)
+                        resolve(socket);
+                    else
+                        reject(new Error(`Joined channel mismatch; expected '${channel}', actual '${data.channel}'`));
+                });
             }
             catch (error)
             {
