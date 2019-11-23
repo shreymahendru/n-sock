@@ -23,7 +23,10 @@ class SocketServer {
             socket.on("n-sock-join_channel", (data) => {
                 n_defensive_1.given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
                 const nsp = this._socketServer.of(`/${data.channel}`);
-                console.log(`Client ${socket.id} joined channel ${nsp.name}`);
+                console.log(`Client ${socket.id} joining channel ${nsp.name}`);
+                nsp.on("connection", (s) => {
+                    console.log(`Client ${s.id} connected to channel ${nsp.name}`);
+                });
             });
         });
     }
