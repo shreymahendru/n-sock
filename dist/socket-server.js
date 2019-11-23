@@ -18,6 +18,22 @@ class SocketServer {
             pubClient: this._client,
             subClient: this._client
         }));
+        this.initialize();
+    }
+    dispose() {
+        if (!this._isDisposed) {
+            this._isDisposed = true;
+            this._disposePromise = new Promise((resolve, _) => {
+                this._socketServer.close(() => {
+                    this._client.quit(() => {
+                        resolve();
+                    });
+                });
+            });
+        }
+        return this._disposePromise;
+    }
+    initialize() {
         this._socketServer.on("connection", (socket) => {
             console.log("Client connected", socket.id);
             socket.on("n-sock-join_channel", (data) => {
@@ -30,13 +46,6 @@ class SocketServer {
                 });
             });
         });
-    }
-    dispose() {
-        if (!this._isDisposed) {
-            this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) => this._client.quit(() => resolve()));
-        }
-        return this._disposePromise;
     }
 }
 exports.SocketServer = SocketServer;

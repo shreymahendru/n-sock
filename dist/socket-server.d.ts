@@ -8,4 +8,5 @@ export declare class SocketServer implements Disposable {
     private _disposePromise;
     constructor(httpServer: Http.Server);
     dispose(): Promise<void>;
+    private initialize;
 }
