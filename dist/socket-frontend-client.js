@@ -89,6 +89,7 @@ class SocketFrontendClient {
                     if (data.channel === channel) {
                         const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
                             transports: ["websocket"],
+                            upgrade: false
                         });
                         resolve(socket);
                     }
