@@ -68,16 +68,13 @@ export class SocketServer implements Disposable
             {
                 given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
 
+                console.log(`Client ${socket.id} joining channel ${data.channel}`);
+                
                 const nsp = this._socketServer.of(`/${data.channel}`);
                 
-                console.log(`Client ${socket.id} joining channel ${nsp.name}`);
-
-                nsp.once("connection", (s) =>
-                {
-                    console.log(`Client ${s.id} joined channel ${nsp.name}`);
-
-                    s.emit("n-sock-join_channel-joined", { channel: nsp.name.substr(1) });
-                });
+                socket.emit(`n-sock-joined_channel/${data.channel}`, { channel: nsp.name.substr(1) });
+                
+                console.log(`Client ${socket.id} joined channel ${nsp.name.substr(1)}`);
             });
         });
     }

@@ -121,20 +121,23 @@ export class SocketFrontendClient implements Disposable
                 given(channel, "channel").ensureHasValue().ensureIsString();
                 channel = channel.trim();
 
-                this._client.emit("n-sock-join_channel", { channel });
-                
-                const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
-                    // WARNING: in that case, there is no fallback to long-polling
-                    transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
-                });
-                
-                socket.on("n-sock-join_channel-joined", (data: {channel: string}) =>
+                this._client.once(`n-sock-joined_channel/${channel}`, (data: { channel: string }) =>
                 {
                     if (data.channel === channel)
+                    {
+                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
+                            // WARNING: in that case, there is no fallback to long-polling
+                            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+                        });
+                        
                         resolve(socket);
+                    }
                     else
                         reject(new Error(`Joined channel mismatch; expected '${channel}', actual '${data.channel}'`));
                 });
+                
+                
+                this._client.emit("n-sock-join_channel", { channel });
             }
             catch (error)
             {
