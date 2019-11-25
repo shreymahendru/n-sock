@@ -85,16 +85,17 @@ class SocketFrontendClient {
             try {
                 n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
                 channel = channel.trim();
-                this._client.emit("n-sock-join_channel", { channel });
-                const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
-                    transports: ["websocket"],
-                });
-                socket.on("n-sock-join_channel-joined", (data) => {
-                    if (data.channel === channel)
+                this._client.once(`n-sock-joined_channel/${channel}`, (data) => {
+                    if (data.channel === channel) {
+                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
+                            transports: ["websocket"],
+                        });
                         resolve(socket);
+                    }
                     else
                         reject(new Error(`Joined channel mismatch; expected '${channel}', actual '${data.channel}'`));
                 });
+                this._client.emit("n-sock-join_channel", { channel });
             }
             catch (error) {
                 reject(error);
