@@ -128,6 +128,7 @@ export class SocketFrontendClient implements Disposable
                         const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
                             // WARNING: in that case, there is no fallback to long-polling
                             transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+                            upgrade: false
                         });
                         
                         resolve(socket);

@@ -22,7 +22,7 @@ export class SocketServer implements Disposable
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
         
-        this._socketServer = SocketIo(httpServer);
+        this._socketServer = SocketIo(httpServer, { transports: ["websocket"], allowUpgrades: false });
         
         this._client = ConfigurationManager.getConfig<string>("env") === "dev"
             ? Redis.createClient() : Redis.createClient(ConfigurationManager.getConfig<string>("REDIS_URL"));
