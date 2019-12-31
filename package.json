@@ -2,8 +2,8 @@
   "name": "@nivinjoseph/n-sock",
   "version": "1.0.12",
   "description": "Socket IO based web sockets implementation compatible with event driven distributed systems",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist",
+  "types": "./dist",
   "scripts": {
     "ts-compile": "tsc -p .",
     "ts-lint": "tslint -p . -c tslint.json",
