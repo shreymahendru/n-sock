@@ -9,7 +9,12 @@ const Redis = require("redis");
 class SocketServer {
     constructor(httpServer) {
         n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        this._socketServer = SocketIo(httpServer, { transports: ["websocket"], allowUpgrades: false });
+        this._socketServer = SocketIo(httpServer, {
+            transports: ["websocket"],
+            pingInterval: 10000,
+            pingTimeout: 5000,
+            serveClient: false
+        });
         this._client = n_config_1.ConfigurationManager.getConfig("env") === "dev"
             ? Redis.createClient() : Redis.createClient(n_config_1.ConfigurationManager.getConfig("REDIS_URL"));
         this._isDisposed = false;
