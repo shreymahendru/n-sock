@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const socket_server_1 = require("./socket-server");
+var socket_server_1 = require("./socket-server");
 exports.SocketServer = socket_server_1.SocketServer;
-const socket_backend_client_1 = require("./socket-backend-client");
-exports.SocketBackendClient = socket_backend_client_1.SocketBackendClient;
+var socket_service_1 = require("./socket-service");
+exports.SocketService = socket_service_1.SocketService;
 //# sourceMappingURL=index.js.map

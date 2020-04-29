@@ -1,5 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const socket_frontend_client_1 = require("./socket-frontend-client");
-exports.SocketFrontendClient = socket_frontend_client_1.SocketFrontendClient;
+var socket_client_1 = require("./socket-client");
+exports.SocketClient = socket_client_1.SocketClient;
 //# sourceMappingURL=index.js.map
