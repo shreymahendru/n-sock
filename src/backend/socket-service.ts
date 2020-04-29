@@ -10,7 +10,7 @@ import { ObjectDisposedException } from "@nivinjoseph/n-exception";
  * This should only emit (publish) events
  */
 @inject("RedisClient")
-export class SocketBackendClient implements Disposable
+export class SocketService implements Disposable
 {
     private readonly _socketClient: SocketIoEmitter.SocketIOEmitter;
     private _isDisposed = false;

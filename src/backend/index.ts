@@ -1,5 +1,2 @@
-import { SocketServer } from "./socket-server";
-import { SocketBackendClient } from "./socket-backend-client";
-
-
-export { SocketServer, SocketBackendClient };
+export { SocketServer } from "./socket-server";
+export { SocketService } from "./socket-service";

@@ -6,7 +6,7 @@ import { Disposable, Mutex } from "@nivinjoseph/n-util";
 /**
  * This should only listen (subscribe) to events, should not emit (publish)
  */
-export class SocketFrontendClient implements Disposable
+export class SocketClient implements Disposable
 {
     private readonly _serverUrl: string;
     private readonly _client: SocketIOClient.Socket;

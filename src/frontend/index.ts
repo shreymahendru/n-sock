@@ -1,4 +1,1 @@
-import { SocketFrontendClient } from "./socket-frontend-client";
-
-
-export { SocketFrontendClient };
+export { SocketClient } from "./socket-client";
