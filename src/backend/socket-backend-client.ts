@@ -1,30 +1,26 @@
 import * as SocketIoEmitter from "socket.io-emitter";
-import { ConfigurationManager } from "@nivinjoseph/n-config";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
+import { inject } from "@nivinjoseph/n-ject";
+import { ObjectDisposedException } from "@nivinjoseph/n-exception";
 
 
 /**
  * This should only emit (publish) events
  */
+@inject("RedisClient")
 export class SocketBackendClient implements Disposable
 {
     private readonly _socketClient: SocketIoEmitter.SocketIOEmitter;
-    private readonly _client: Redis.RedisClient;
-    private _isDisposed: boolean;
-    private _disposePromise: Promise<void> | null;   
+    private _isDisposed = false;
+    private _disposePromise: Promise<void> | null = null;   
     
     
-    public constructor()
+    public constructor(redisClient: Redis.RedisClient)
     {
-        this._client = ConfigurationManager.getConfig<string>("env") === "dev"
-            ? Redis.createClient() : Redis.createClient(ConfigurationManager.getConfig<string>("REDIS_URL"));
-
-        this._isDisposed = false;
-        this._disposePromise = null;
-        
-        this._socketClient = SocketIoEmitter(this._client as any);
+        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        this._socketClient = SocketIoEmitter(redisClient as any);
     }
     
     
@@ -38,6 +34,9 @@ export class SocketBackendClient implements Disposable
         
         given(data, "data").ensureHasValue().ensureIsObject();
         
+        if (this._isDisposed)
+            throw new ObjectDisposedException(this);
+        
         this._socketClient.of(`/${channel}`).emit(event, data);
     }
     
@@ -46,7 +45,7 @@ export class SocketBackendClient implements Disposable
         if (!this._isDisposed)
         {
             this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) => this._client.quit(() => resolve()));
+            this._disposePromise = Promise.resolve();
         }
 
         return this._disposePromise as Promise<void>;

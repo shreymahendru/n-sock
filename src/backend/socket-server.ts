@@ -2,7 +2,6 @@ import * as Http from "http";
 import { given } from "@nivinjoseph/n-defensive";
 import * as SocketIo from "socket.io";
 import * as SocketIoRedis from "socket.io-redis";
-import { ConfigurationManager } from "@nivinjoseph/n-config";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 
@@ -13,15 +12,13 @@ import { Disposable } from "@nivinjoseph/n-util";
 export class SocketServer implements Disposable
 {
     private readonly _socketServer: SocketIO.Server;
-    private readonly _client: Redis.RedisClient;
-    private _isDisposed: boolean;
-    private _disposePromise: Promise<void> | null;
+    private _isDisposed = false;
+    private _disposePromise: Promise<void> | null = null;
     
     
-    public constructor(httpServer: Http.Server)
+    public constructor(httpServer: Http.Server, redisClient: Redis.RedisClient)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        
         this._socketServer = SocketIo(httpServer, {
             transports: ["websocket"],
             pingInterval: 10000,
@@ -29,15 +26,10 @@ export class SocketServer implements Disposable
             serveClient: false
         });
         
-        this._client = ConfigurationManager.getConfig<string>("env") === "dev"
-            ? Redis.createClient() : Redis.createClient(ConfigurationManager.getConfig<string>("REDIS_URL"));
-
-        this._isDisposed = false;
-        this._disposePromise = null;
-        
+        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._socketServer.adapter(SocketIoRedis({
-            pubClient: this._client,
-            subClient: this._client
+            pubClient: redisClient,
+            subClient: redisClient
         }));
         
         this.initialize();
@@ -49,18 +41,10 @@ export class SocketServer implements Disposable
         {
             this._isDisposed = true;
             this._disposePromise = new Promise((resolve, _) =>
-            {
-                this._socketServer.close(() =>
-                {
-                    this._client.quit(() =>
-                    {
-                        resolve();
-                    });
-                });
-            });
+                this._socketServer.close(() => resolve()));
         }
 
-        return this._disposePromise as Promise<void>;
+        return this._disposePromise;
     }
     
     private initialize(): void
