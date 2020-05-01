@@ -2,25 +2,27 @@ import * as SocketIoEmitter from "socket.io-emitter";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
-import { inject } from "@nivinjoseph/n-ject";
 import { ObjectDisposedException } from "@nivinjoseph/n-exception";
 
 
 /**
  * This should only emit (publish) events
  */
-@inject("RedisClient")
 export class SocketService implements Disposable
 {
     private readonly _socketClient: SocketIoEmitter.SocketIOEmitter;
+    private readonly _redisClient: Redis.RedisClient;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;   
     
     
-    public constructor(redisClient: Redis.RedisClient)
+    public constructor(redisUrl?: string)
     {
-        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
-        this._socketClient = SocketIoEmitter(redisClient as any);
+        given(redisUrl, "redisUrl").ensureIsString();
+        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+            ? Redis.createClient(redisUrl) : Redis.createClient();
+        
+        this._socketClient = SocketIoEmitter(this._redisClient as any);
     }
     
     
@@ -45,7 +47,7 @@ export class SocketService implements Disposable
         if (!this._isDisposed)
         {
             this._isDisposed = true;
-            this._disposePromise = Promise.resolve();
+            this._disposePromise = new Promise((resolve, _) => this._redisClient.quit(() => resolve()));
         }
 
         return this._disposePromise as Promise<void>;

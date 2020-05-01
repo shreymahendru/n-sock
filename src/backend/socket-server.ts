@@ -12,11 +12,12 @@ import { Disposable } from "@nivinjoseph/n-util";
 export class SocketServer implements Disposable
 {
     private readonly _socketServer: SocketIO.Server;
+    private readonly _redisClient: Redis.RedisClient;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
     
     
-    public constructor(httpServer: Http.Server, redisClient: Redis.RedisClient)
+    public constructor(httpServer: Http.Server, redisUrl?: string)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
         this._socketServer = SocketIo(httpServer, {
@@ -26,10 +27,13 @@ export class SocketServer implements Disposable
             serveClient: false
         });
         
-        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        given(redisUrl, "redisUrl").ensureIsString();
+        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+            ? Redis.createClient(redisUrl) : Redis.createClient();
+        
         this._socketServer.adapter(SocketIoRedis({
-            pubClient: redisClient,
-            subClient: redisClient
+            pubClient: this._redisClient,
+            subClient: this._redisClient
         }));
         
         this.initialize();
@@ -41,7 +45,7 @@ export class SocketServer implements Disposable
         {
             this._isDisposed = true;
             this._disposePromise = new Promise((resolve, _) =>
-                this._socketServer.close(() => resolve()));
+                this._socketServer.close(() => this._redisClient.quit(() => resolve())));
         }
 
         return this._disposePromise;
