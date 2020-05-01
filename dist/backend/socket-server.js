@@ -4,8 +4,9 @@ const Http = require("http");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const SocketIo = require("socket.io");
 const SocketIoRedis = require("socket.io-redis");
+const Redis = require("redis");
 class SocketServer {
-    constructor(httpServer, redisClient) {
+    constructor(httpServer, redisUrl) {
         this._isDisposed = false;
         this._disposePromise = null;
         n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
@@ -15,17 +16,19 @@ class SocketServer {
             pingTimeout: 5000,
             serveClient: false
         });
-        n_defensive_1.given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
+        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+            ? Redis.createClient(redisUrl) : Redis.createClient();
         this._socketServer.adapter(SocketIoRedis({
-            pubClient: redisClient,
-            subClient: redisClient
+            pubClient: this._redisClient,
+            subClient: this._redisClient
         }));
         this.initialize();
     }
     dispose() {
         if (!this._isDisposed) {
             this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) => this._socketServer.close(() => resolve()));
+            this._disposePromise = new Promise((resolve, _) => this._socketServer.close(() => this._redisClient.quit(() => resolve())));
         }
         return this._disposePromise;
     }
