@@ -33,26 +33,26 @@
   "devDependencies": {
     "@types/mocha": "^7.0.2",
     "@types/node": "^12.12.17",
-    "@types/redis": "^2.8.18",
-    "@types/socket.io": "^2.1.4",
-    "@types/socket.io-client": "^1.4.32",
+    "@types/redis": "^2.8.25",
+    "@types/socket.io": "^2.1.8",
+    "@types/socket.io-client": "^1.4.33",
     "@types/socket.io-emitter": "^3.1.0",
-    "@types/socket.io-redis": "^1.0.25",
+    "@types/socket.io-redis": "^1.0.26",
     "mocha": "^7.1.2",
-    "ts-node": "^8.9.1",
+    "ts-node": "^8.10.2",
     "tslint": "^6.1.2",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.6",
     "typescript-tslint-plugin": "^0.5.5"
   },
   "dependencies": {
-    "@nivinjoseph/n-defensive": "^1.0.32",
+    "@nivinjoseph/n-defensive": "^1.0.33",
     "@nivinjoseph/n-exception": "^1.0.19",
     "@nivinjoseph/n-ext": "^1.1.19",
-    "@nivinjoseph/n-util": "^1.0.39",
+    "@nivinjoseph/n-util": "^1.0.54",
     "redis": "^3.0.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "socket.io-emitter": "^3.1.1",
-    "socket.io-redis": "^5.2.0"
+    "socket.io-redis": "^5.3.0"
   }
 }
