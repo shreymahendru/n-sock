@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SocketServer = void 0;
 const Http = require("http");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const SocketIo = require("socket.io");

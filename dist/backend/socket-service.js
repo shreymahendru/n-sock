@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SocketService = void 0;
 const SocketIoEmitter = require("socket.io-emitter");
 const Redis = require("redis");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
