@@ -20,7 +20,7 @@ export class SocketServer implements Disposable
     public constructor(httpServer: Http.Server, redisUrl?: string)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        this._socketServer = new SocketIo.Server(httpServer, {
+        this._socketServer = SocketIo(httpServer, {
             transports: ["websocket"],
             pingInterval: 10000,
             pingTimeout: 5000,
@@ -36,7 +36,7 @@ export class SocketServer implements Disposable
             })
             : Redis.createClient();
         
-        this._socketServer.adapter(SocketIoRedis.createAdapter({
+        this._socketServer.adapter(SocketIoRedis({
             pubClient: this._redisClient,
             subClient: this._redisClient
         }));
