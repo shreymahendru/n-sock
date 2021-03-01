@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SocketService = exports.SocketServer = void 0;
 require("@nivinjoseph/n-ext");
 var socket_server_1 = require("./socket-server");
 Object.defineProperty(exports, "SocketServer", { enumerable: true, get: function () { return socket_server_1.SocketServer; } });

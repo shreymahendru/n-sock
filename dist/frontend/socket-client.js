@@ -23,7 +23,7 @@ class SocketClient {
         if (serverUrl.endsWith("/"))
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
         this._serverUrl = serverUrl;
-        this._client = SocketIOClient.connect(this._serverUrl, {
+        this._client = SocketIOClient.io(this._serverUrl, {
             transports: ["websocket"],
         });
     }
@@ -88,7 +88,7 @@ class SocketClient {
                 channel = channel.trim();
                 this._client.once(`n-sock-joined_channel/${channel}`, (data) => {
                     if (data.channel === channel) {
-                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
+                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, {
                             transports: ["websocket"],
                             upgrade: false
                         });

@@ -11,7 +11,7 @@ class SocketServer {
         this._isDisposed = false;
         this._disposePromise = null;
         n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        this._socketServer = SocketIo(httpServer, {
+        this._socketServer = new SocketIo.Server(httpServer, {
             transports: ["websocket"],
             pingInterval: 10000,
             pingTimeout: 5000,
@@ -19,8 +19,13 @@ class SocketServer {
         });
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl) : Redis.createClient();
-        this._socketServer.adapter(SocketIoRedis({
+            ? Redis.createClient(redisUrl, {
+                tls: {
+                    rejectUnauthorized: false
+                }
+            })
+            : Redis.createClient();
+        this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
             subClient: this._redisClient
         }));
