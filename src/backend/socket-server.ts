@@ -11,7 +11,7 @@ import { Disposable } from "@nivinjoseph/n-util";
  */
 export class SocketServer implements Disposable
 {
-    private readonly _socketServer: SocketIO.Server;
+    private readonly _socketServer: SocketIo.Server;
     private readonly _redisClient: Redis.RedisClient;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
@@ -20,7 +20,7 @@ export class SocketServer implements Disposable
     public constructor(httpServer: Http.Server, redisUrl?: string)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        this._socketServer = SocketIo(httpServer, {
+        this._socketServer = new SocketIo.Server(httpServer, {
             transports: ["websocket"],
             pingInterval: 10000,
             pingTimeout: 5000,
@@ -29,9 +29,14 @@ export class SocketServer implements Disposable
         
         given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl) : Redis.createClient();
+            ? Redis.createClient(redisUrl, {
+                tls: {
+                    rejectUnauthorized: false
+                }
+            })
+            : Redis.createClient();
         
-        this._socketServer.adapter(SocketIoRedis({
+        this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
             subClient: this._redisClient
         }));

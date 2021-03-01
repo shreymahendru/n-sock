@@ -20,7 +20,12 @@ export class SocketService implements Disposable
     {
         given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl) : Redis.createClient();
+            ? Redis.createClient(redisUrl, {
+                tls: {
+                    rejectUnauthorized: false
+                }
+            })
+            : Redis.createClient();
         
         this._socketClient = SocketIoEmitter(this._redisClient as any);
     }
