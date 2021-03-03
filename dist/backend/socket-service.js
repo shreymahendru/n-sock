@@ -5,6 +5,9 @@ const SocketIoEmitter = require("socket.io-emitter");
 const Redis = require("redis");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const n_exception_1 = require("@nivinjoseph/n-exception");
+/**
+ * This should only emit (publish) events
+ */
 class SocketService {
     constructor(redisUrl) {
         this._isDisposed = false;

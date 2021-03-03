@@ -6,17 +6,21 @@ const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const SocketIo = require("socket.io");
 const SocketIoRedis = require("socket.io-redis");
 const Redis = require("redis");
+/**
+ * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
+ */
 class SocketServer {
     constructor(httpServer, redisUrl) {
         this._isDisposed = false;
         this._disposePromise = null;
         n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        this._socketServer = SocketIo(httpServer, {
-            transports: ["websocket"],
-            pingInterval: 10000,
-            pingTimeout: 5000,
-            serveClient: false
-        });
+        // this._socketServer = new SocketIo.Server(httpServer, {
+        //     transports: ["websocket"],
+        //     pingInterval: 10000,
+        //     pingTimeout: 5000,
+        //     serveClient: false
+        // });
+        this._socketServer = new SocketIo.Server(httpServer);
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
             ? Redis.createClient(redisUrl, {
@@ -25,7 +29,7 @@ class SocketServer {
                 }
             })
             : Redis.createClient();
-        this._socketServer.adapter(SocketIoRedis({
+        this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
             subClient: this._redisClient
         }));

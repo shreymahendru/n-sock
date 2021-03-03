@@ -1,4 +1,7 @@
 import { Disposable } from "@nivinjoseph/n-util";
+/**
+ * This should only emit (publish) events
+ */
 export declare class SocketService implements Disposable {
     private readonly _socketClient;
     private readonly _redisClient;

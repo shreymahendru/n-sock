@@ -13,6 +13,9 @@ exports.SocketClient = void 0;
 const SocketIOClient = require("socket.io-client");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const n_util_1 = require("@nivinjoseph/n-util");
+/**
+ * This should only listen (subscribe) to events, should not emit (publish)
+ */
 class SocketClient {
     constructor(serverUrl) {
         this._channels = new Map();
@@ -23,12 +26,15 @@ class SocketClient {
         if (serverUrl.endsWith("/"))
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
         this._serverUrl = serverUrl;
-        this._client = SocketIOClient.connect(this._serverUrl, {
-            transports: ["websocket"],
-        });
+        // this._client = SocketIOClient.io(this._serverUrl, {
+        //     // WARNING: in that case, there is no fallback to long-polling
+        //     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+        // });
+        this._client = SocketIOClient.io(this._serverUrl);
     }
     subscribe(channel, event, handler) {
         return __awaiter(this, void 0, void 0, function* () {
+            // should be synchronized;
             n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
             channel = channel.trim();
             n_defensive_1.given(event, "event").ensureHasValue().ensureIsString();
@@ -50,6 +56,7 @@ class SocketClient {
     }
     unsubscribe(channel, event, handler) {
         return __awaiter(this, void 0, void 0, function* () {
+            // should be synchronized
             n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
             channel = channel.trim();
             yield this._mutex.lock();
@@ -88,10 +95,12 @@ class SocketClient {
                 channel = channel.trim();
                 this._client.once(`n-sock-joined_channel/${channel}`, (data) => {
                     if (data.channel === channel) {
-                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
-                            transports: ["websocket"],
-                            upgrade: false
-                        });
+                        // const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, {
+                        //     // WARNING: in that case, there is no fallback to long-polling
+                        //     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+                        //     upgrade: false
+                        // });
+                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`);
                         resolve(socket);
                     }
                     else
