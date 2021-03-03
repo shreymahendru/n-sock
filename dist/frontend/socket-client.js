@@ -26,11 +26,10 @@ class SocketClient {
         if (serverUrl.endsWith("/"))
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
         this._serverUrl = serverUrl;
-        // this._client = SocketIOClient.io(this._serverUrl, {
-        //     // WARNING: in that case, there is no fallback to long-polling
-        //     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
-        // });
-        this._client = SocketIOClient.io(this._serverUrl);
+        this._client = SocketIOClient.io(this._serverUrl, {
+            // WARNING: in that case, there is no fallback to long-polling
+            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+        });
     }
     subscribe(channel, event, handler) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -95,12 +94,12 @@ class SocketClient {
                 channel = channel.trim();
                 this._client.once(`n-sock-joined_channel/${channel}`, (data) => {
                     if (data.channel === channel) {
-                        // const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, {
-                        //     // WARNING: in that case, there is no fallback to long-polling
-                        //     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
-                        //     upgrade: false
-                        // });
-                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`);
+                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, {
+                            // WARNING: in that case, there is no fallback to long-polling
+                            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+                            // upgrade: false
+                        });
+                        // const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`);
                         resolve(socket);
                     }
                     else

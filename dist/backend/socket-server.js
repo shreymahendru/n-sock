@@ -22,6 +22,8 @@ class SocketServer {
         //     serveClient: false
         // });
         this._socketServer = new SocketIo.Server(httpServer, {
+            transports: ["websocket"],
+            serveClient: false,
             cors: {
                 origin: corsOrigin,
                 methods: ["GET", "POST"]
