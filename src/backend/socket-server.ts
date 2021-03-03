@@ -17,9 +17,11 @@ export class SocketServer implements Disposable
     private _disposePromise: Promise<void> | null = null;
     
     
-    public constructor(httpServer: Http.Server, redisUrl?: string)
+    public constructor(httpServer: Http.Server, corsOrigin: string, redisUrl?: string)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
+        given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
+        
         // this._socketServer = new SocketIo.Server(httpServer, {
         //     transports: ["websocket"],
         //     pingInterval: 10000,
@@ -27,7 +29,12 @@ export class SocketServer implements Disposable
         //     serveClient: false
         // });
         
-        this._socketServer = new SocketIo.Server(httpServer);
+        this._socketServer = new SocketIo.Server(httpServer, {
+            cors: {
+                origin: corsOrigin,
+                methods: ["GET", "POST"]
+            }
+        });
         
         given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
