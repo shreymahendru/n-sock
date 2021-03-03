@@ -30,6 +30,8 @@ export class SocketServer implements Disposable
         // });
         
         this._socketServer = new SocketIo.Server(httpServer, {
+            transports: ["websocket"],
+            serveClient: false,
             cors: {
                 origin: corsOrigin,
                 methods: ["GET", "POST"]
@@ -67,7 +69,7 @@ export class SocketServer implements Disposable
     
     private initialize(): void
     {
-        this._socketServer.on("connection", (socket) =>
+        this._socketServer.on("connection", (socket: SocketIo.Socket) =>
         {
             console.log("Client connected", socket.id);
 
