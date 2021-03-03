@@ -10,17 +10,23 @@ const Redis = require("redis");
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
  */
 class SocketServer {
-    constructor(httpServer, redisUrl) {
+    constructor(httpServer, corsOrigin, redisUrl) {
         this._isDisposed = false;
         this._disposePromise = null;
         n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
+        n_defensive_1.given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
         // this._socketServer = new SocketIo.Server(httpServer, {
         //     transports: ["websocket"],
         //     pingInterval: 10000,
         //     pingTimeout: 5000,
         //     serveClient: false
         // });
-        this._socketServer = new SocketIo.Server(httpServer);
+        this._socketServer = new SocketIo.Server(httpServer, {
+            cors: {
+                origin: corsOrigin,
+                methods: ["GET", "POST"]
+            }
+        });
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
             ? Redis.createClient(redisUrl, {

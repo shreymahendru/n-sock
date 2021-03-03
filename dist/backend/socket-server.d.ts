@@ -9,7 +9,7 @@ export declare class SocketServer implements Disposable {
     private readonly _redisClient;
     private _isDisposed;
     private _disposePromise;
-    constructor(httpServer: Http.Server, redisUrl?: string);
+    constructor(httpServer: Http.Server, corsOrigin: string, redisUrl?: string);
     dispose(): Promise<void>;
     private initialize;
 }
