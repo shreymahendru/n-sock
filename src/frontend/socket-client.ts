@@ -24,10 +24,12 @@ export class SocketClient implements Disposable
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
         this._serverUrl = serverUrl;    
         
-        this._client = SocketIOClient.connect(this._serverUrl, {
-            // WARNING: in that case, there is no fallback to long-polling
-            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
-        });
+        // this._client = SocketIOClient.io(this._serverUrl, {
+        //     // WARNING: in that case, there is no fallback to long-polling
+        //     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+        // });
+        
+        this._client = SocketIOClient.io(this._serverUrl);
     }
     
     
@@ -125,11 +127,13 @@ export class SocketClient implements Disposable
                 {
                     if (data.channel === channel)
                     {
-                        const socket = SocketIOClient.connect(`${this._serverUrl}/${channel}`, {
-                            // WARNING: in that case, there is no fallback to long-polling
-                            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
-                            upgrade: false
-                        });
+                        // const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, {
+                        //     // WARNING: in that case, there is no fallback to long-polling
+                        //     transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+                        //     upgrade: false
+                        // });
+                        
+                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`);
                         
                         resolve(socket);
                     }
