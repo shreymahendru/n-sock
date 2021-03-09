@@ -1,4 +1,4 @@
 import "@nivinjoseph/n-ext";
 
 
-export { SocketClient } from "./socket-client";
+export { SocketClient, SocketChannelSubscription } from "./socket-client";
