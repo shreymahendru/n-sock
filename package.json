@@ -1,6 +1,6 @@
 {
   "name": "@nivinjoseph/n-sock",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "Socket IO based web sockets implementation compatible with event driven distributed systems",
   "main": "./dist",
   "types": "./dist",
