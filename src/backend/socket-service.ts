@@ -2,7 +2,7 @@ import * as SocketIoEmitter from "socket.io-emitter";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
-import { ObjectDisposedException } from "@nivinjoseph/n-exception";
+import { ApplicationException, ObjectDisposedException } from "@nivinjoseph/n-exception";
 
 
 /**
@@ -19,9 +19,19 @@ export class SocketService implements Disposable
     public constructor(redisUrl?: string)
     {
         given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl)
-            : Redis.createClient();
+        this._redisClient = (() =>
+        {
+            try 
+            {
+                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+                    ? Redis.createClient(redisUrl)
+                    : Redis.createClient();
+            }
+            catch (error)
+            {
+                throw new ApplicationException("Error during redis initialization", error);
+            }
+        })();
         
         this._socketClient = SocketIoEmitter(this._redisClient as any);
     }

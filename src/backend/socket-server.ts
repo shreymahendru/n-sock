@@ -4,6 +4,7 @@ import * as SocketIo from "socket.io";
 import * as SocketIoRedis from "socket.io-redis";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
+import { ApplicationException } from "@nivinjoseph/n-exception";
 
 
 /**
@@ -39,9 +40,19 @@ export class SocketServer implements Disposable
         });
         
         given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl)
-            : Redis.createClient();
+        this._redisClient = (() =>
+        {
+            try 
+            {
+                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+                    ? Redis.createClient(redisUrl)
+                    : Redis.createClient();
+            }
+            catch (error)
+            {
+                throw new ApplicationException("Error during redis initialization", error);
+            }
+        })();
         
         this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
