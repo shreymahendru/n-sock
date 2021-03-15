@@ -31,11 +31,7 @@ class SocketServer {
         });
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl, {
-                tls: {
-                    rejectUnauthorized: false
-                }
-            })
+            ? Redis.createClient(redisUrl)
             : Redis.createClient();
         this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,

@@ -14,11 +14,7 @@ class SocketService {
         this._disposePromise = null;
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
         this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl, {
-                tls: {
-                    rejectUnauthorized: false
-                }
-            })
+            ? Redis.createClient(redisUrl)
             : Redis.createClient();
         this._socketClient = SocketIoEmitter(this._redisClient);
     }
