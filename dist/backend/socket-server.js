@@ -5,17 +5,16 @@ const Http = require("http");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const SocketIo = require("socket.io");
 const SocketIoRedis = require("socket.io-redis");
-const Redis = require("redis");
-const n_exception_1 = require("@nivinjoseph/n-exception");
 /**
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
  */
 class SocketServer {
-    constructor(httpServer, corsOrigin, redisUrl) {
+    constructor(httpServer, corsOrigin, redisClient) {
         this._isDisposed = false;
         this._disposePromise = null;
         n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
         n_defensive_1.given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
+        n_defensive_1.given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         // this._socketServer = new SocketIo.Server(httpServer, {
         //     transports: ["websocket"],
         //     pingInterval: 10000,
@@ -30,17 +29,7 @@ class SocketServer {
                 methods: ["GET", "POST"]
             }
         });
-        n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = (() => {
-            try {
-                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-                    ? Redis.createClient(redisUrl)
-                    : Redis.createClient();
-            }
-            catch (error) {
-                throw new n_exception_1.ApplicationException("Error during redis initialization", error);
-            }
-        })();
+        this._redisClient = redisClient;
         this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
             subClient: this._redisClient
@@ -50,7 +39,7 @@ class SocketServer {
     dispose() {
         if (!this._isDisposed) {
             this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) => this._socketServer.close(() => this._redisClient.quit(() => resolve())));
+            this._disposePromise = Promise.resolve();
         }
         return this._disposePromise;
     }
