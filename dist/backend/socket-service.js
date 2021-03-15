@@ -13,9 +13,16 @@ class SocketService {
         this._isDisposed = false;
         this._disposePromise = null;
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl)
-            : Redis.createClient();
+        this._redisClient = (() => {
+            try {
+                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+                    ? Redis.createClient(redisUrl)
+                    : Redis.createClient();
+            }
+            catch (error) {
+                throw new n_exception_1.ApplicationException("Error during redis initialization", error);
+            }
+        })();
         this._socketClient = SocketIoEmitter(this._redisClient);
     }
     publish(channel, event, data) {

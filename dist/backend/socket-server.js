@@ -6,6 +6,7 @@ const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const SocketIo = require("socket.io");
 const SocketIoRedis = require("socket.io-redis");
 const Redis = require("redis");
+const n_exception_1 = require("@nivinjoseph/n-exception");
 /**
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
  */
@@ -30,9 +31,16 @@ class SocketServer {
             }
         });
         n_defensive_1.given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-            ? Redis.createClient(redisUrl)
-            : Redis.createClient();
+        this._redisClient = (() => {
+            try {
+                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
+                    ? Redis.createClient(redisUrl)
+                    : Redis.createClient();
+            }
+            catch (error) {
+                throw new n_exception_1.ApplicationException("Error during redis initialization", error);
+            }
+        })();
         this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
             subClient: this._redisClient
