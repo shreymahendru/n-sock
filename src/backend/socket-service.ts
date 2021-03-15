@@ -2,7 +2,7 @@ import * as SocketIoEmitter from "socket.io-emitter";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
-import { ApplicationException, ObjectDisposedException } from "@nivinjoseph/n-exception";
+import { ObjectDisposedException } from "@nivinjoseph/n-exception";
 
 
 /**
@@ -16,22 +16,10 @@ export class SocketService implements Disposable
     private _disposePromise: Promise<void> | null = null;   
     
     
-    public constructor(redisUrl?: string)
+    public constructor(redisClient: Redis.RedisClient)
     {
-        given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = (() =>
-        {
-            try 
-            {
-                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-                    ? Redis.createClient(redisUrl)
-                    : Redis.createClient();
-            }
-            catch (error)
-            {
-                throw new ApplicationException("Error during redis initialization", error);
-            }
-        })();
+        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        this._redisClient = redisClient;
         
         this._socketClient = SocketIoEmitter(this._redisClient as any);
     }
@@ -58,7 +46,7 @@ export class SocketService implements Disposable
         if (!this._isDisposed)
         {
             this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) => this._redisClient.quit(() => resolve()));
+            this._disposePromise = Promise.resolve();
         }
 
         return this._disposePromise as Promise<void>;

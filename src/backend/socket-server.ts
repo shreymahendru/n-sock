@@ -4,7 +4,6 @@ import * as SocketIo from "socket.io";
 import * as SocketIoRedis from "socket.io-redis";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
-import { ApplicationException } from "@nivinjoseph/n-exception";
 
 
 /**
@@ -18,10 +17,11 @@ export class SocketServer implements Disposable
     private _disposePromise: Promise<void> | null = null;
     
     
-    public constructor(httpServer: Http.Server, corsOrigin: string, redisUrl?: string)
+    public constructor(httpServer: Http.Server, corsOrigin: string, redisClient: Redis.RedisClient)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
         given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
+        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         
         // this._socketServer = new SocketIo.Server(httpServer, {
         //     transports: ["websocket"],
@@ -39,20 +39,7 @@ export class SocketServer implements Disposable
             }
         });
         
-        given(redisUrl, "redisUrl").ensureIsString();
-        this._redisClient = (() =>
-        {
-            try 
-            {
-                return redisUrl && redisUrl.isNotEmptyOrWhiteSpace()
-                    ? Redis.createClient(redisUrl)
-                    : Redis.createClient();
-            }
-            catch (error)
-            {
-                throw new ApplicationException("Error during redis initialization", error);
-            }
-        })();
+        this._redisClient = redisClient;
         
         this._socketServer.adapter(SocketIoRedis.createAdapter({
             pubClient: this._redisClient,
@@ -67,8 +54,7 @@ export class SocketServer implements Disposable
         if (!this._isDisposed)
         {
             this._isDisposed = true;
-            this._disposePromise = new Promise((resolve, _) =>
-                this._socketServer.close(() => this._redisClient.quit(() => resolve())));
+            this._disposePromise = Promise.resolve();
         }
 
         return this._disposePromise;
