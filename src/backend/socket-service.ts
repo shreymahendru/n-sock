@@ -1,4 +1,4 @@
-import * as SocketIoEmitter from "socket.io-emitter";
+const SocketIoEmitter = require("socket.io-emitter");
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
@@ -10,7 +10,7 @@ import { ObjectDisposedException } from "@nivinjoseph/n-exception";
  */
 export class SocketService implements Disposable
 {
-    private readonly _socketClient: SocketIoEmitter.SocketIOEmitter;
+    private readonly _socketClient: any;
     private readonly _redisClient: Redis.RedisClient;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;   
