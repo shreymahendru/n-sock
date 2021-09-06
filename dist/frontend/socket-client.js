@@ -23,7 +23,7 @@ class SocketClient {
         this._mutex = new n_util_1.Mutex();
         this._isDisposed = false;
         this._disposePromise = null;
-        n_defensive_1.given(serverUrl, "serverUrl").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(serverUrl, "serverUrl").ensureHasValue().ensureIsString();
         serverUrl = serverUrl.trim();
         if (serverUrl.endsWith("/"))
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
@@ -37,9 +37,9 @@ class SocketClient {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             // should be synchronized;
-            n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
+            (0, n_defensive_1.given)(channel, "channel").ensureHasValue().ensureIsString();
             channel = channel.trim();
-            n_defensive_1.given(event, "event").ensureHasValue().ensureIsString();
+            (0, n_defensive_1.given)(event, "event").ensureHasValue().ensureIsString();
             event = event.trim();
             if (this._isDisposed)
                 throw new n_exception_1.ObjectDisposedException(this);
@@ -91,7 +91,7 @@ class SocketClient {
     createChannel(channel) {
         return new Promise((resolve, reject) => {
             try {
-                n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
+                (0, n_defensive_1.given)(channel, "channel").ensureHasValue().ensureIsString();
                 channel = channel.trim();
                 this._master.once(`n-sock-joined_channel/${channel}`, (data) => {
                     if (data.channel === channel) {
@@ -117,19 +117,19 @@ class InternalSocketChannelSubscription {
         this._isUnsubscribed = false;
         this._eventHandler = null;
         this._connectionChangeHandler = null;
-        n_defensive_1.given(eventName, "eventName").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(eventName, "eventName").ensureHasValue().ensureIsString();
         this._eventName = eventName;
     }
     get eventName() { return this._eventName; }
     get eventHandler() { return this._eventHandler; }
     get connectionChangeHandler() { return this._connectionChangeHandler; }
     onData(callback) {
-        n_defensive_1.given(callback, "callback").ensureHasValue().ensureIsFunction();
+        (0, n_defensive_1.given)(callback, "callback").ensureHasValue().ensureIsFunction();
         this._eventHandler = callback;
         return this;
     }
     onConnectionChange(callback) {
-        n_defensive_1.given(callback, "callback").ensureHasValue().ensureIsFunction();
+        (0, n_defensive_1.given)(callback, "callback").ensureHasValue().ensureIsFunction();
         this._connectionChangeHandler = callback;
         return this;
     }
@@ -140,7 +140,7 @@ class InternalSocketChannelSubscription {
         this._isUnsubscribed = true;
     }
     onUnsubscribe(callback) {
-        n_defensive_1.given(callback, "callback").ensureHasValue().ensureIsFunction();
+        (0, n_defensive_1.given)(callback, "callback").ensureHasValue().ensureIsFunction();
         this._unsubscribeHandler = callback;
     }
 }
@@ -150,19 +150,19 @@ class SocketChannel {
         this._subscriptions = new Array();
         this._isReconnecting = false;
         this._isDisposed = false;
-        n_defensive_1.given(serverUrl, "serverUrl").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(serverUrl, "serverUrl").ensureHasValue().ensureIsString();
         this._serverUrl = serverUrl;
-        n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(channel, "channel").ensureHasValue().ensureIsString();
         this._channel = channel;
-        n_defensive_1.given(socket, "socket").ensureHasValue().ensureIsObject();
+        (0, n_defensive_1.given)(socket, "socket").ensureHasValue().ensureIsObject();
         this._socket = socket;
-        n_defensive_1.given(master, "master").ensureHasValue().ensureIsObject();
+        (0, n_defensive_1.given)(master, "master").ensureHasValue().ensureIsObject();
         this._master = master;
         this.initialize();
     }
     get channel() { return this._channel; }
     subscribe(eventName) {
-        n_defensive_1.given(eventName, "eventName").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(eventName, "eventName").ensureHasValue().ensureIsString();
         eventName = eventName.trim();
         const subscription = new InternalSocketChannelSubscription(eventName);
         subscription.onUnsubscribe(() => this._subscriptions.remove(subscription));

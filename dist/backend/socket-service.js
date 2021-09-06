@@ -11,16 +11,16 @@ class SocketService {
     constructor(redisClient) {
         this._isDisposed = false;
         this._disposePromise = null;
-        n_defensive_1.given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        (0, n_defensive_1.given)(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._redisClient = redisClient;
         this._socketClient = SocketIoEmitter(this._redisClient);
     }
     publish(channel, event, data) {
-        n_defensive_1.given(channel, "channel").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(channel, "channel").ensureHasValue().ensureIsString();
         channel = channel.trim();
-        n_defensive_1.given(event, "event").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(event, "event").ensureHasValue().ensureIsString();
         event = event.trim();
-        n_defensive_1.given(data, "data").ensureHasValue().ensureIsObject();
+        (0, n_defensive_1.given)(data, "data").ensureHasValue().ensureIsObject();
         if (this._isDisposed)
             throw new n_exception_1.ObjectDisposedException(this);
         this._socketClient.of(`/${channel}`).emit(event, data);

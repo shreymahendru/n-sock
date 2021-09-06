@@ -12,9 +12,9 @@ class SocketServer {
     constructor(httpServer, corsOrigin, redisClient) {
         this._isDisposed = false;
         this._disposePromise = null;
-        n_defensive_1.given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
-        n_defensive_1.given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
-        n_defensive_1.given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        (0, n_defensive_1.given)(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
+        (0, n_defensive_1.given)(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
+        (0, n_defensive_1.given)(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         // this._socketServer = new SocketIo.Server(httpServer, {
         //     transports: ["websocket"],
         //     pingInterval: 10000,
@@ -47,7 +47,7 @@ class SocketServer {
         this._socketServer.on("connection", (socket) => {
             console.log("Client connected", socket.id);
             socket.on("n-sock-join_channel", (data) => {
-                n_defensive_1.given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
+                (0, n_defensive_1.given)(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
                 console.log(`Client ${socket.id} joining channel ${data.channel}`);
                 const nsp = this._socketServer.of(`/${data.channel}`);
                 socket.emit(`n-sock-joined_channel/${data.channel}`, { channel: nsp.name.substr(1) });
