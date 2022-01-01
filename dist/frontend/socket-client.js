@@ -187,6 +187,13 @@ class SocketChannel {
         return Promise.resolve();
     }
     initialize() {
+        this._eventNames.forEach((eventName) => {
+            this._socket.on(eventName, (data) => {
+                this._subscriptions
+                    .where(t => t.eventName === eventName && t.eventHandler != null)
+                    .forEach(t => t.eventHandler(data));
+            });
+        });
         this._socket.on("connect", () => {
             this._subscriptions.where(t => t.connectionChangeHandler != null).forEach(t => t.connectionChangeHandler());
         });
