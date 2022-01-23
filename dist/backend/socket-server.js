@@ -4,7 +4,7 @@ exports.SocketServer = void 0;
 const Http = require("http");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const SocketIo = require("socket.io");
-const SocketIoRedis = require("socket.io-redis");
+const SocketIoRedis = require("@socket.io/redis-adapter");
 /**
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
  */
@@ -30,10 +30,11 @@ class SocketServer {
             }
         });
         this._redisClient = redisClient;
-        this._socketServer.adapter(SocketIoRedis.createAdapter({
-            pubClient: this._redisClient,
-            subClient: this._redisClient
-        }));
+        // this._socketServer.adapter(SocketIoRedis.createAdapter({
+        //     pubClient: this._redisClient,
+        //     subClient: this._redisClient
+        // }));
+        this._socketServer.adapter(SocketIoRedis.createAdapter(this._redisClient, this._redisClient));
         this.initialize();
     }
     dispose() {

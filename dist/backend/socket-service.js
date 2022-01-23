@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SocketService = void 0;
-const SocketIoEmitter = require("socket.io-emitter");
+const redis_emitter_1 = require("@socket.io/redis-emitter");
 const n_defensive_1 = require("@nivinjoseph/n-defensive");
 const n_exception_1 = require("@nivinjoseph/n-exception");
 /**
@@ -13,7 +13,7 @@ class SocketService {
         this._disposePromise = null;
         (0, n_defensive_1.given)(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._redisClient = redisClient;
-        this._socketClient = SocketIoEmitter(this._redisClient);
+        this._socketClient = new redis_emitter_1.Emitter(this._redisClient);
     }
     publish(channel, event, data) {
         (0, n_defensive_1.given)(channel, "channel").ensureHasValue().ensureIsString();
