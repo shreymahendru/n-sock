@@ -1,5 +1,5 @@
-const SocketIoEmitter = require("socket.io-emitter");
 import * as Redis from "redis";
+import { Emitter } from "@socket.io/redis-emitter";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
 import { ObjectDisposedException } from "@nivinjoseph/n-exception";
@@ -10,7 +10,7 @@ import { ObjectDisposedException } from "@nivinjoseph/n-exception";
  */
 export class SocketService implements Disposable
 {
-    private readonly _socketClient: any;
+    private readonly _socketClient: Emitter;
     private readonly _redisClient: Redis.RedisClient;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;   
@@ -21,7 +21,7 @@ export class SocketService implements Disposable
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._redisClient = redisClient;
         
-        this._socketClient = SocketIoEmitter(this._redisClient as any);
+        this._socketClient = new Emitter(this._redisClient as any);
     }
     
     

@@ -1,7 +1,7 @@
 import * as Http from "http";
 import { given } from "@nivinjoseph/n-defensive";
 import * as SocketIo from "socket.io";
-import * as SocketIoRedis from "socket.io-redis";
+import * as SocketIoRedis from "@socket.io/redis-adapter";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 
@@ -41,10 +41,12 @@ export class SocketServer implements Disposable
         
         this._redisClient = redisClient;
         
-        this._socketServer.adapter(SocketIoRedis.createAdapter({
-            pubClient: this._redisClient,
-            subClient: this._redisClient
-        }));
+        // this._socketServer.adapter(SocketIoRedis.createAdapter({
+        //     pubClient: this._redisClient,
+        //     subClient: this._redisClient
+        // }));
+        
+        this._socketServer.adapter(SocketIoRedis.createAdapter(this._redisClient, this._redisClient));
         
         this.initialize();
     }   
