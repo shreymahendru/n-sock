@@ -28,7 +28,7 @@ export class SocketClient implements Disposable
         
         this._master = SocketIOClient.io(this._serverUrl, {
             // WARNING: in that case, there is no fallback to long-polling
-            transports: ["websocket"], // or [ 'websocket', 'polling' ], which is the same thing
+            transports: ["websocket"] // or [ 'websocket', 'polling' ], which is the same thing
         });
     }
     
@@ -49,7 +49,7 @@ export class SocketClient implements Disposable
         await this._mutex.lock();
         try
         {
-            const socketChannel = this._channels.find(t => t.channel === channel) ?? await this.createChannel(channel);
+            const socketChannel = this._channels.find(t => t.channel === channel) ?? await this._createChannel(channel);
             
             return socketChannel.subscribe(event);
         }
@@ -103,10 +103,10 @@ export class SocketClient implements Disposable
             this._master.close();
         }
         
-        return this._disposePromise;
+        return this._disposePromise as Promise<void>;
     }
     
-    private createChannel(channel: string): Promise<SocketChannel>
+    private _createChannel(channel: string): Promise<SocketChannel>
     {
         return new Promise((resolve, reject) =>
         {
@@ -115,7 +115,7 @@ export class SocketClient implements Disposable
                 given(channel, "channel").ensureHasValue().ensureIsString();
                 channel = channel.trim();
 
-                this._master.once(`n-sock-joined_channel/${channel}`, (data: { channel: string }) =>
+                this._master.once(`n-sock-joined_channel/${channel}`, (data: { channel: string; }) =>
                 {
                     if (data.channel === channel)
                     {
@@ -156,15 +156,15 @@ class InternalSocketChannelSubscription implements SocketChannelSubscription
 {
     private readonly _eventName: string;
     private _isUnsubscribed = false;
-    private _eventHandler: (data: any) => void | null = null;
-    private _connectionChangeHandler: () => void | null = null;
-    private _unsubscribeHandler: () => void;
+    private _eventHandler: ((data: any) => void) | null = null;
+    private _connectionChangeHandler: (() => void) | null = null;
+    private _unsubscribeHandler: (() => void) | null = null;
     
     
     
     public get eventName(): string { return this._eventName; }
-    public get eventHandler(): (data: any) => void | null { return this._eventHandler; }
-    public get connectionChangeHandler(): () => void | null { return this._connectionChangeHandler; }
+    public get eventHandler(): ((data: any) => void) | null { return this._eventHandler; }
+    public get connectionChangeHandler(): (() => void) | null { return this._connectionChangeHandler; }
     
     
     public constructor(eventName: string)
@@ -193,7 +193,8 @@ class InternalSocketChannelSubscription implements SocketChannelSubscription
         if (this._isUnsubscribed)
             return;
         
-        this._unsubscribeHandler();
+        if (this._unsubscribeHandler != null)
+            this._unsubscribeHandler();
         
         this._isUnsubscribed = true;
     }
@@ -214,7 +215,7 @@ class SocketChannel implements Disposable
     private readonly _eventNames = new Set<string>();
     private readonly _subscriptions = new Array<InternalSocketChannelSubscription>();
     private _isReconnecting = false;
-    private _isDisposed: boolean = false;
+    private _isDisposed = false;
     
     
     public get channel(): string { return this._channel; }
@@ -234,7 +235,7 @@ class SocketChannel implements Disposable
         given(master, "master").ensureHasValue().ensureIsObject();
         this._master = master;
         
-        this.initialize();
+        this._initialize();
     }
     
     
@@ -257,7 +258,7 @@ class SocketChannel implements Disposable
             {
                 this._subscriptions
                     .where(t => t.eventName === eventName && t.eventHandler != null)
-                    .forEach(t => t.eventHandler(data));
+                    .forEach(t => t.eventHandler!(data));
             });
         }
         
@@ -278,7 +279,7 @@ class SocketChannel implements Disposable
     }
     
     
-    private initialize(): void
+    private _initialize(): void
     {
         this._eventNames.forEach((eventName) =>
         {
@@ -286,24 +287,24 @@ class SocketChannel implements Disposable
             {
                 this._subscriptions
                     .where(t => t.eventName === eventName && t.eventHandler != null)
-                    .forEach(t => t.eventHandler(data));
+                    .forEach(t => t.eventHandler!(data));
             });
         });
         
         this._socket.on("connect", () =>
         {
-            this._subscriptions.where(t => t.connectionChangeHandler != null).forEach(t => t.connectionChangeHandler());
+            this._subscriptions.where(t => t.connectionChangeHandler != null).forEach(t => t.connectionChangeHandler!());
         });
         
-        this._socket.on("connect_error", (err: { message: string }) =>
+        this._socket.on("connect_error", (err: { message: string; }) =>
         {
             console.warn(`SocketChannel connect_error due to ${err.message}`);
 
-            if (err.message?.trim() === "Invalid namespace" && !this._isReconnecting)
+            if (err.message.trim() === "Invalid namespace" && !this._isReconnecting)
             {
                 this._isReconnecting = true;
                 
-                this._master.once(`n-sock-joined_channel/${this._channel}`, (data: { channel: string }) =>
+                this._master.once(`n-sock-joined_channel/${this._channel}`, (data: { channel: string; }) =>
                 {
                     try 
                     {
@@ -316,7 +317,7 @@ class SocketChannel implements Disposable
                             this._socket.close();
 
                             this._socket = socket;
-                            this.initialize();
+                            this._initialize();
                         }
                         else
                             throw new Error(`Joined channel mismatch; expected '${this._channel}', actual '${data.channel}'`);
@@ -334,7 +335,7 @@ class SocketChannel implements Disposable
                 this._master.emit("n-sock-join_channel", { channel: this._channel });
             }
             
-            this._subscriptions.where(t => t.connectionChangeHandler != null).forEach(t => t.connectionChangeHandler());
+            this._subscriptions.where(t => t.connectionChangeHandler != null).forEach(t => t.connectionChangeHandler!());
         });
     }
 }

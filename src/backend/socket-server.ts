@@ -48,7 +48,7 @@ export class SocketServer implements Disposable
         
         this._socketServer.adapter(SocketIoRedis.createAdapter(this._redisClient, this._redisClient));
         
-        this.initialize();
+        this._initialize();
     }   
     
     public dispose(): Promise<void>
@@ -59,16 +59,16 @@ export class SocketServer implements Disposable
             this._disposePromise = Promise.resolve();
         }
 
-        return this._disposePromise;
+        return this._disposePromise!;
     }
     
-    private initialize(): void
+    private _initialize(): void
     {
         this._socketServer.on("connection", (socket: SocketIo.Socket) =>
         {
             console.log("Client connected", socket.id);
 
-            socket.on("n-sock-join_channel", (data: { channel: string }) =>
+            socket.on("n-sock-join_channel", (data: { channel: string; }) =>
             {
                 given(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
 
