@@ -42,16 +42,16 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "@nivinjoseph/n-defensive": "^1.0.39",
+    "@nivinjoseph/n-defensive": "^1.0.41",
     "@nivinjoseph/n-exception": "^1.0.26",
     "@nivinjoseph/n-ext": "^1.1.35",
-    "@nivinjoseph/n-util": "^1.0.79",
+    "@nivinjoseph/n-util": "^1.0.80",
     "@socket.io/redis-adapter": "^7.2.0",
-    "@socket.io/redis-emitter": "^4.1.1",
-    "bufferutil": "^4.0.6",
+    "@socket.io/redis-emitter": "^5.0.0",
+    "bufferutil": "^4.0.7",
     "redis": "^3.1.2",
-    "socket.io": "^4.5.1",
-    "socket.io-client": "^4.5.1",
-    "utf-8-validate": "^5.0.9"
+    "socket.io": "^4.5.4",
+    "socket.io-client": "^4.5.4",
+    "utf-8-validate": "^5.0.10"
   }
 }
