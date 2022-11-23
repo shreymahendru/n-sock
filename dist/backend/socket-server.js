@@ -40,12 +40,22 @@ class SocketServer {
     dispose() {
         if (!this._isDisposed) {
             this._isDisposed = true;
-            this._disposePromise = Promise.resolve();
+            this._disposePromise = new Promise((resolve, reject) => {
+                this._socketServer.close((err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    resolve();
+                });
+            });
         }
         return this._disposePromise;
     }
     _initialize() {
         this._socketServer.on("connection", (socket) => {
+            if (this._isDisposed)
+                return;
             console.log("Client connected", socket.id);
             socket.on("n-sock-join_channel", (data) => {
                 (0, n_defensive_1.given)(data, "data").ensureHasValue().ensureIsObject().ensureHasStructure({ channel: "string" });
