@@ -1,4 +1,4 @@
-import * as Redis from "redis";
+import Redis from "redis";
 import { Emitter } from "@socket.io/redis-emitter";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
