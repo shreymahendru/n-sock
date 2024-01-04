@@ -5,11 +5,12 @@
     "packageManager": "yarn@4.0.2",
     "type": "module",
     "exports": {
-        "backend": {
+        ".": null,
+        "./backend": {
             "types": "./dist/backend/index.d.ts",
             "default": "./dist/backend/index.js"
         },
-        "frontend": {
+        "./frontend": {
             "types": "./dist/frontend/index.d.ts",
             "default": "./dist/frontend/index.js"
         }
