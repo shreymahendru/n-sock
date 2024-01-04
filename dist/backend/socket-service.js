@@ -1,28 +1,25 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketService = void 0;
-const redis_emitter_1 = require("@socket.io/redis-emitter");
-const n_defensive_1 = require("@nivinjoseph/n-defensive");
-const n_exception_1 = require("@nivinjoseph/n-exception");
+import { Emitter } from "@socket.io/redis-emitter";
+import { given } from "@nivinjoseph/n-defensive";
+import { ObjectDisposedException } from "@nivinjoseph/n-exception";
 /**
  * This should only emit (publish) events
  */
-class SocketService {
+export class SocketService {
     constructor(redisClient) {
         this._isDisposed = false;
         this._disposePromise = null;
-        (0, n_defensive_1.given)(redisClient, "redisClient").ensureHasValue().ensureIsObject();
+        given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._redisClient = redisClient;
-        this._socketClient = new redis_emitter_1.Emitter(this._redisClient);
+        this._socketClient = new Emitter(this._redisClient);
     }
     publish(channel, event, data) {
-        (0, n_defensive_1.given)(channel, "channel").ensureHasValue().ensureIsString();
+        given(channel, "channel").ensureHasValue().ensureIsString();
         channel = channel.trim();
-        (0, n_defensive_1.given)(event, "event").ensureHasValue().ensureIsString();
+        given(event, "event").ensureHasValue().ensureIsString();
         event = event.trim();
-        (0, n_defensive_1.given)(data, "data").ensureHasValue().ensureIsObject();
+        given(data, "data").ensureHasValue().ensureIsObject();
         if (this._isDisposed)
-            throw new n_exception_1.ObjectDisposedException(this);
+            throw new ObjectDisposedException(this);
         this._socketClient.of(`/${channel}`).emit(event, data);
     }
     dispose() {
@@ -33,5 +30,4 @@ class SocketService {
         return this._disposePromise;
     }
 }
-exports.SocketService = SocketService;
 //# sourceMappingURL=socket-service.js.map

@@ -20,3 +20,4 @@ export interface SocketChannelSubscription {
     onConnectionChange(callback: () => void): this;
     unsubscribe(): void;
 }
+//# sourceMappingURL=socket-client.d.ts.map

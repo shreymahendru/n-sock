@@ -12,3 +12,4 @@ export declare class SocketService implements Disposable {
     publish(channel: string, event: string, data: object): void;
     dispose(): Promise<void>;
 }
+//# sourceMappingURL=socket-service.d.ts.map

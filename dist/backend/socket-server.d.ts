@@ -1,5 +1,5 @@
-/// <reference types="node" />
-import * as Http from "http";
+/// <reference types="node" resolution-mode="require"/>
+import Http from "node:http";
 import * as Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 /**
@@ -14,3 +14,4 @@ export declare class SocketServer implements Disposable {
     dispose(): Promise<void>;
     private _initialize;
 }
+//# sourceMappingURL=socket-server.d.ts.map

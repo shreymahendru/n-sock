@@ -1,9 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SocketService = exports.SocketServer = void 0;
-require("@nivinjoseph/n-ext");
-var socket_server_1 = require("./socket-server");
-Object.defineProperty(exports, "SocketServer", { enumerable: true, get: function () { return socket_server_1.SocketServer; } });
-var socket_service_1 = require("./socket-service");
-Object.defineProperty(exports, "SocketService", { enumerable: true, get: function () { return socket_service_1.SocketService; } });
+import "@nivinjoseph/n-ext";
+export { SocketServer } from "./socket-server.js";
+export { SocketService } from "./socket-service.js";
 //# sourceMappingURL=index.js.map
