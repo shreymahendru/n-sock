@@ -1,9 +1,9 @@
 import Http from "node:http";
 import { given } from "@nivinjoseph/n-defensive";
-import * as Redis from "redis";
+import Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
-import { Server, Socket } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
+import SocketIo from "socket.io";
+import SocketIoRedis from "@socket.io/redis-adapter";
 
 
 /**
@@ -11,7 +11,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
  */
 export class SocketServer implements Disposable
 {
-    private readonly _socketServer: Server;
+    private readonly _socketServer: SocketIo.Server;
     private readonly _redisClient: Redis.RedisClient;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
@@ -30,7 +30,7 @@ export class SocketServer implements Disposable
         //     serveClient: false
         // });
 
-        this._socketServer = new Server(httpServer, {
+        this._socketServer = new SocketIo.Server(httpServer, {
             transports: ["websocket"],
             serveClient: false,
             cors: {
@@ -46,7 +46,7 @@ export class SocketServer implements Disposable
         //     subClient: this._redisClient
         // }));
 
-        this._socketServer.adapter(createAdapter(this._redisClient, this._redisClient));
+        this._socketServer.adapter(SocketIoRedis.createAdapter(this._redisClient, this._redisClient));
 
         this._initialize();
     }
@@ -77,7 +77,7 @@ export class SocketServer implements Disposable
 
     private _initialize(): void
     {
-        this._socketServer.on("connection", (socket: Socket) =>
+        this._socketServer.on("connection", (socket: SocketIo.Socket) =>
         {
             if (this._isDisposed)
                 return;

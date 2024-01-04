@@ -1,7 +1,7 @@
+import * as SocketIOClient from "socket.io-client";
 import { given } from "@nivinjoseph/n-defensive";
 import { Disposable, Mutex } from "@nivinjoseph/n-util";
 import { ObjectDisposedException } from "@nivinjoseph/n-exception";
-import { Socket, io } from "socket.io-client";
 
 
 /**
@@ -10,7 +10,7 @@ import { Socket, io } from "socket.io-client";
 export class SocketClient implements Disposable
 {
     private readonly _serverUrl: string;
-    private readonly _master: Socket;
+    private readonly _master: SocketIOClient.Socket;
     private readonly _channels = new Array<SocketChannel>();
     private readonly _mutex = new Mutex();
 
@@ -26,7 +26,7 @@ export class SocketClient implements Disposable
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
         this._serverUrl = serverUrl;
 
-        this._master = io(this._serverUrl, {
+        this._master = SocketIOClient.io(this._serverUrl, {
             // WARNING: in that case, there is no fallback to long-polling
             transports: ["websocket"] // or [ 'websocket', 'polling' ], which is the same thing
         });
@@ -119,7 +119,7 @@ export class SocketClient implements Disposable
                 {
                     if (data.channel === channel)
                     {
-                        const socket = io(`${this._serverUrl}/${channel}`, { transports: ["websocket"] });
+                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, { transports: ["websocket"] });
 
                         const socketChannel = new SocketChannel(this._serverUrl, channel, socket, this._master);
 
@@ -210,8 +210,8 @@ class SocketChannel implements Disposable
 {
     private readonly _serverUrl: string;
     private readonly _channel: string;
-    private _socket: Socket;
-    private readonly _master: Socket;
+    private _socket: SocketIOClient.Socket;
+    private readonly _master: SocketIOClient.Socket;
     private readonly _eventNames = new Set<string>();
     private readonly _subscriptions = new Array<InternalSocketChannelSubscription>();
     private _isReconnecting = false;
@@ -221,7 +221,7 @@ class SocketChannel implements Disposable
     public get channel(): string { return this._channel; }
 
 
-    public constructor(serverUrl: string, channel: string, socket: Socket, master: Socket)
+    public constructor(serverUrl: string, channel: string, socket: SocketIOClient.Socket, master: SocketIOClient.Socket)
     {
         given(serverUrl, "serverUrl").ensureHasValue().ensureIsString();
         this._serverUrl = serverUrl;
@@ -310,7 +310,7 @@ class SocketChannel implements Disposable
                     {
                         if (data.channel === this._channel)
                         {
-                            const socket = io(`${this._serverUrl}/${this._channel}`,
+                            const socket = SocketIOClient.io(`${this._serverUrl}/${this._channel}`,
                                 { transports: ["websocket"] });
 
                             this._socket.off("connect_error");
