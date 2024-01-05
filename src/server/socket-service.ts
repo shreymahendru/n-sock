@@ -1,8 +1,8 @@
-import Redis from "redis";
 import { Emitter } from "@socket.io/redis-emitter";
 import { Disposable } from "@nivinjoseph/n-util";
 import { given } from "@nivinjoseph/n-defensive";
 import { ObjectDisposedException } from "@nivinjoseph/n-exception";
+import { RedisClientType } from "redis";
 
 
 /**
@@ -11,12 +11,12 @@ import { ObjectDisposedException } from "@nivinjoseph/n-exception";
 export class SocketService implements Disposable
 {
     private readonly _socketClient: Emitter;
-    private readonly _redisClient: Redis.RedisClient;
+    private readonly _redisClient: RedisClientType<any, any, any>;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
 
 
-    public constructor(redisClient: Redis.RedisClient)
+    public constructor(redisClient: RedisClientType<any, any, any>)
     {
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._redisClient = redisClient;
