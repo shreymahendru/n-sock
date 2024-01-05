@@ -1,8 +1,8 @@
-import Http from "node:http";
+import { Server } from "node:http";
 import { given } from "@nivinjoseph/n-defensive";
-import Redis from "redis";
+import { RedisClientType } from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
-import * as SocketIo from "socket.io";
+import { Socket, Server as SocketIoServer } from "socket.io";
 import SocketIoRedis from "@socket.io/redis-adapter";
 
 
@@ -11,15 +11,15 @@ import SocketIoRedis from "@socket.io/redis-adapter";
  */
 export class SocketServer implements Disposable
 {
-    private readonly _socketServer: SocketIo.Server;
-    private readonly _redisClient: Redis.RedisClientType;
+    private readonly _socketServer: SocketIoServer;
+    private readonly _redisClient: RedisClientType;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
 
 
-    public constructor(httpServer: Http.Server, corsOrigin: string, redisClient: Redis.RedisClientType)
+    public constructor(httpServer: Server, corsOrigin: string, redisClient: RedisClientType)
     {
-        given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
+        given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
         given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
 
@@ -30,7 +30,7 @@ export class SocketServer implements Disposable
         //     serveClient: false
         // });
 
-        this._socketServer = new SocketIo.Server(httpServer, {
+        this._socketServer = new SocketIoServer(httpServer, {
             transports: ["websocket"],
             serveClient: false,
             cors: {
@@ -77,7 +77,7 @@ export class SocketServer implements Disposable
 
     private _initialize(): void
     {
-        this._socketServer.on("connection", (socket: SocketIo.Socket) =>
+        this._socketServer.on("connection", (socket: Socket) =>
         {
             if (this._isDisposed)
                 return;
