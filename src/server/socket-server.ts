@@ -12,12 +12,12 @@ import SocketIoRedis from "@socket.io/redis-adapter";
 export class SocketServer implements Disposable
 {
     private readonly _socketServer: SocketIoServer;
-    private readonly _redisClient: RedisClientType;
+    private readonly _redisClient: RedisClientType<any, any, any>;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
 
 
-    public constructor(httpServer: Server, corsOrigin: string, redisClient: RedisClientType)
+    public constructor(httpServer: Server, corsOrigin: string, redisClient: RedisClientType<any, any, any>)
     {
         given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
         given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
