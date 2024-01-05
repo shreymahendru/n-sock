@@ -1,7 +1,7 @@
 import { Server } from "node:http";
 import { given } from "@nivinjoseph/n-defensive";
 import { Server as SocketIoServer } from "socket.io";
-import SocketIoRedis from "@socket.io/redis-adapter";
+import { createAdapter } from "@socket.io/redis-adapter";
 /**
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
  */
@@ -31,7 +31,7 @@ export class SocketServer {
         //     pubClient: this._redisClient,
         //     subClient: this._redisClient
         // }));
-        this._socketServer.adapter(SocketIoRedis.createAdapter(this._redisClient, this._redisClient));
+        this._socketServer.adapter(createAdapter(this._redisClient, this._redisClient));
         this._initialize();
     }
     dispose() {

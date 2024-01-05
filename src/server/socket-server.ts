@@ -3,7 +3,7 @@ import { given } from "@nivinjoseph/n-defensive";
 import { RedisClientType } from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
 import { Socket, Server as SocketIoServer } from "socket.io";
-import SocketIoRedis from "@socket.io/redis-adapter";
+import { createAdapter } from "@socket.io/redis-adapter";
 
 
 /**
@@ -46,7 +46,7 @@ export class SocketServer implements Disposable
         //     subClient: this._redisClient
         // }));
 
-        this._socketServer.adapter(SocketIoRedis.createAdapter(this._redisClient, this._redisClient));
+        this._socketServer.adapter(createAdapter(this._redisClient, this._redisClient));
 
         this._initialize();
     }
