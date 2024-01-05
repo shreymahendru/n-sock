@@ -1,6 +1,6 @@
-import Http from "node:http";
+import { Server } from "node:http";
 import { given } from "@nivinjoseph/n-defensive";
-import * as SocketIo from "socket.io";
+import { Server as SocketIoServer } from "socket.io";
 import SocketIoRedis from "@socket.io/redis-adapter";
 /**
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
@@ -9,7 +9,7 @@ export class SocketServer {
     constructor(httpServer, corsOrigin, redisClient) {
         this._isDisposed = false;
         this._disposePromise = null;
-        given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Http.Server);
+        given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
         given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         // this._socketServer = new SocketIo.Server(httpServer, {
@@ -18,7 +18,7 @@ export class SocketServer {
         //     pingTimeout: 5000,
         //     serveClient: false
         // });
-        this._socketServer = new SocketIo.Server(httpServer, {
+        this._socketServer = new SocketIoServer(httpServer, {
             transports: ["websocket"],
             serveClient: false,
             cors: {
