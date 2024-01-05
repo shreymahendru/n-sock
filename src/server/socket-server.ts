@@ -19,7 +19,7 @@ export class SocketServer implements Disposable
 
     public constructor(httpServer: Server, corsOrigin: string, redisClient: RedisClientType<any, any, any>)
     {
-        given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
+        given(httpServer, "httpServers").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
         given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
 

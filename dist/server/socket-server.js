@@ -9,7 +9,7 @@ export class SocketServer {
     constructor(httpServer, corsOrigin, redisClient) {
         this._isDisposed = false;
         this._disposePromise = null;
-        given(httpServer, "httpServer").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
+        given(httpServer, "httpServers").ensureHasValue().ensureIsObject().ensureIsInstanceOf(Server);
         given(corsOrigin, "corsOrigin").ensureHasValue().ensureIsString();
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         // this._socketServer = new SocketIo.Server(httpServer, {
