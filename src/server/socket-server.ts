@@ -2,7 +2,7 @@ import Http from "node:http";
 import { given } from "@nivinjoseph/n-defensive";
 import Redis from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
-import SocketIo from "socket.io";
+import * as SocketIo from "socket.io";
 import SocketIoRedis from "@socket.io/redis-adapter";
 
 

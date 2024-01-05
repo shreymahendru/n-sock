@@ -1,6 +1,6 @@
 import Http from "node:http";
 import { given } from "@nivinjoseph/n-defensive";
-import SocketIo from "socket.io";
+import * as SocketIo from "socket.io";
 import SocketIoRedis from "@socket.io/redis-adapter";
 /**
  * This should only manage socket connections, should not emit (publish) or listen (subscribe)??
