@@ -1,7 +1,7 @@
-import * as SocketIOClient from "socket.io-client";
 import { given } from "@nivinjoseph/n-defensive";
 import { Mutex } from "@nivinjoseph/n-util";
 import { ObjectDisposedException } from "@nivinjoseph/n-exception";
+import { io as SocketIo } from "socket.io-client";
 /**
  * This should only listen (subscribe) to events, should not emit (publish)
  */
@@ -16,7 +16,7 @@ export class SocketClient {
         if (serverUrl.endsWith("/"))
             serverUrl = serverUrl.substr(0, serverUrl.length - 1);
         this._serverUrl = serverUrl;
-        this._master = SocketIOClient.io(this._serverUrl, {
+        this._master = SocketIo(this._serverUrl, {
             // WARNING: in that case, there is no fallback to long-polling
             transports: ["websocket"] // or [ 'websocket', 'polling' ], which is the same thing
         });
@@ -81,7 +81,7 @@ export class SocketClient {
                 channel = channel.trim();
                 this._master.once(`n-sock-joined_channel/${channel}`, (data) => {
                     if (data.channel === channel) {
-                        const socket = SocketIOClient.io(`${this._serverUrl}/${channel}`, { transports: ["websocket"] });
+                        const socket = SocketIo(`${this._serverUrl}/${channel}`, { transports: ["websocket"] });
                         const socketChannel = new SocketChannel(this._serverUrl, channel, socket, this._master);
                         this._channels.push(socketChannel);
                         resolve(socketChannel);
@@ -191,7 +191,7 @@ class SocketChannel {
                 this._master.once(`n-sock-joined_channel/${this._channel}`, (data) => {
                     try {
                         if (data.channel === this._channel) {
-                            const socket = SocketIOClient.io(`${this._serverUrl}/${this._channel}`, { transports: ["websocket"] });
+                            const socket = SocketIo(`${this._serverUrl}/${this._channel}`, { transports: ["websocket"] });
                             this._socket.off("connect_error");
                             this._socket.close();
                             this._socket = socket;
