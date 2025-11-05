@@ -38,6 +38,7 @@ export class SocketServer {
         if (!this._isDisposed) {
             this._isDisposed = true;
             this._disposePromise = new Promise((resolve, reject) => {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 this._socketServer.close((err) => {
                     if (err) {
                         reject(err);

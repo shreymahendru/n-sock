@@ -1,4 +1,3 @@
-/// <reference types="node" resolution-mode="require"/>
 import { Server } from "node:http";
 import { RedisClientType } from "redis";
 import { Disposable } from "@nivinjoseph/n-util";
