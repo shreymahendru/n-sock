@@ -59,6 +59,7 @@ export class SocketServer implements Disposable
 
             this._disposePromise = new Promise((resolve, reject) =>
             {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 this._socketServer.close((err) =>
                 {
                     if (err)
