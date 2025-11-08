@@ -11,12 +11,12 @@ import { RedisClientType } from "redis";
 export class SocketService implements Disposable
 {
     private readonly _socketClient: Emitter;
-    private readonly _redisClient: RedisClientType<any, any, any>;
+    private readonly _redisClient: RedisClientType<any, any, any, any, any>;
     private _isDisposed = false;
     private _disposePromise: Promise<void> | null = null;
 
 
-    public constructor(redisClient: RedisClientType<any, any, any>)
+    public constructor(redisClient: RedisClientType<any, any, any, any, any>)
     {
         given(redisClient, "redisClient").ensureHasValue().ensureIsObject();
         this._redisClient = redisClient;
